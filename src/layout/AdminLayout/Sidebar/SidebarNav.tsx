@@ -138,13 +138,7 @@ export default function SidebarNav() {
       </SidebarNavItem>
       <SidebarNavItem icon={faPerson} href="#">
         Sellers
-      </SidebarNavItem>        
-      <SidebarNavGroup toggleIcon={faBell} toggleText="Notifications">
-        <SidebarNavItem href="#">Alerts</SidebarNavItem>
-        <SidebarNavItem href="#">Banners</SidebarNavItem>
-        <SidebarNavItem href="#">Modals</SidebarNavItem>
-        <SidebarNavItem href="#">Segmentation</SidebarNavItem>
-      </SidebarNavGroup>      
+      </SidebarNavItem>  
 
       <SidebarNavGroup toggleIcon={faStar} toggleText="Pages">
         <SidebarNavItem icon={faRightToBracket} href="login">Login</SidebarNavItem>

@@ -1,7 +1,7 @@
-import { Dropdown, Table } from 'react-bootstrap'
+import { Dropdown, Form, Table } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons'
-import React, { createContext } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Customer } from '@models/customer'
 import { THSort } from '@components/TableSort'
@@ -38,14 +38,46 @@ type Props = {
 
 export default function CustomerList(props: Props) {
   const { customers, setSort, setOrder } = props
+  const [filteredCustomers, setFilteredCustomers] = useState(customers); 
 
   const router = useRouter();
+
+  const filterCustomers = (filterText: string) => {
+    
+    const filtered = customers.filter((customer) =>
+      customer.name.toLowerCase().includes(filterText.toLowerCase())
+    );
+    setFilteredCustomers(filtered);
+  };
+
+  useEffect(() => {
+    setFilteredCustomers(customers); 
+  }, [customers]);
+
+  const navigateToInfo = (customerId: number) => {
+    router.push(`/customers/info?id=${customerId}`); 
+  };
 
   const navigateToEdit = (customerId: number) => {
     router.push(`/customers/edit?id=${customerId}`); 
   };
 
+  const navigateToDelete = (customerId: number) => {
+    if(confirm("Are you sure to delete the customer?")) {
+
+    }
+   
+  };
+
   return (
+    <div>
+      <Form.Group>
+      <Form.Control
+        type="text"
+        placeholder="Filter by customer name"
+        onChange={(e) => filterCustomers(e.target.value)}
+      />
+    </Form.Group>
     
     <Table responsive bordered hover>
       <thead className="bg-light">
@@ -59,7 +91,7 @@ export default function CustomerList(props: Props) {
         </tr>
       </thead>
       <tbody>
-        {customers.map((customer) => (
+        {filteredCustomers.map((customer) => (
           <tr key={customer.id}>
             <td>{customer.id}</td>                 
             <td>{customer.name}</td>
@@ -97,10 +129,12 @@ export default function CustomerList(props: Props) {
                 </Dropdown.Toggle>
                 
                 <Dropdown.Menu>  
-                <Dropdown.Item onClick={() => navigateToEdit(customer.id)}> 
+                <Dropdown.Item onClick={() => navigateToInfo(customer.id)}> 
                     Info
                   </Dropdown.Item>
-                  <Dropdown.Item href={`/customers/edit`}>Edit</Dropdown.Item>
+                  <Dropdown.Item onClick={() => navigateToEdit(customer.id)}> 
+                    Edit
+                  </Dropdown.Item>
                   <Dropdown.Item
                     className="text-danger"
                     href="#/action-3"
@@ -114,5 +148,6 @@ export default function CustomerList(props: Props) {
         ))}
       </tbody>
     </Table>
+  </div>
   )
 }

@@ -42,12 +42,12 @@ export default function HeaderNotificationNav() {
             </Badge>
           </Dropdown.Toggle>
           <Dropdown.Menu className="pt-0" align="end">
-            <Dropdown.Header className="bg-light fw-bold rounded-top">Hay 5 procesos pendientes</Dropdown.Header>
+            <Dropdown.Header className="bg-light fw-bold rounded-top">5 pending processes</Dropdown.Header>
 
             <Link href="#" passHref legacyBehavior>
               <Dropdown.Item>
                 <small className="d-flex">
-                  <div>Nuevos vendedores</div>
+                  <div>New sellers</div>
                   <div className="ms-auto">0%</div>
                 </small>
                 <ProgressBar
@@ -60,7 +60,7 @@ export default function HeaderNotificationNav() {
             <Link href="#" passHref legacyBehavior>
               <Dropdown.Item>
                 <small className="d-flex">
-                  <div>Pedidos pendientes</div>
+                  <div>Pending orders</div>
                   <div className="ms-auto">25%</div>
                 </small>
                 <ProgressBar
@@ -73,7 +73,7 @@ export default function HeaderNotificationNav() {
             <Link href="#" passHref legacyBehavior>
               <Dropdown.Item>
                 <small className="d-flex">
-                  <div>Carga cron</div>
+                  <div>Cron loading</div>
                   <div className="ms-auto">50%</div>
                 </small>
                 <ProgressBar
@@ -86,7 +86,7 @@ export default function HeaderNotificationNav() {
             <Link href="#" passHref legacyBehavior>
               <Dropdown.Item>
                 <small className="d-flex">
-                  <div>Carga de productos</div>
+                  <div>Product loading</div>
                   <div className="ms-auto">80%</div>
                 </small>
                 <ProgressBar

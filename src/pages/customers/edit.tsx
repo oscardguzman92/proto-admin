@@ -1,28 +1,78 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router'; // Importa el objeto useRouter
-import { Badge, Card, Container } from 'react-bootstrap';
-import Image from 'next/image';
+import { useRouter } from 'next/router'; 
+import { Badge, Card, Container, Form, Button } from 'react-bootstrap';
 import AdminLayout from '@layout/AdminLayout/AdminLayout';
 
-export default function EditProducto() {
-  const router = useRouter(); // Obtiene el objeto router de Next.js
-  const { id } = router.query; // Obtiene el valor del parámetro "id" de la URL
+export default function EditCustomer() {
+  const router = useRouter(); 
+  const { id } = router.query; 
 
   const [customerDetails, setCustomerDetails] = useState(Object);
 
-  // Simula una solicitud a la API (debes reemplazar esto con tu lógica real)
+  const [customerName, setCustomerName] = useState('');
+  const [available, setAvailable] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [storeId, setStoreId] = useState('');
+
   useEffect(() => {
     if (id) {       
       fetch(`${process.env.NEXT_PUBLIC_LIST_API_BASE_URL}customers/${id}`)
         .then((response) => response.json())
         .then((data) => {
           setCustomerDetails(data);
+
+          setCustomerName(data.name);
+          setAvailable(data.available);
+          setStartDate(
+            new Date(data.createdAt).toLocaleString('es-ES', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })
+          );
+          setStoreId(data.store_id);
         })
         .catch((error) => {
           console.error('Error loading product details:', error);
         });
     }
   }, [id]);
+
+  const handleFormSubmit = (event:any) => {
+    event.preventDefault();
+  
+    const updatedCustomer = {
+      id: id,
+      name: customerName,
+      available: available,
+      createdAt: new Date(startDate), 
+      store_id: storeId,
+    };
+    if(confirm("Are you sure to update the customer "+customerName+" with id "+id+"?")){
+        fetch(`${process.env.NEXT_PUBLIC_LIST_API_BASE_URL}customers/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify(updatedCustomer), 
+        })
+        .then((response) => {
+            if (response.ok) {
+            alert('Successfully updated customer'); 
+            router.push(`/customers/client`);         
+            } else {
+            console.error('Error updating customer:', response.status);        
+            }
+        })
+        .catch((error) => {
+            console.error('Error updating info: ', error);
+        });
+    }
+  };
+
 
   return (
 <AdminLayout>
@@ -41,57 +91,50 @@ export default function EditProducto() {
                                     <div className="text-black-50 small">Name</div>
                                 </div>
                         </Card.Header>
-                        <Card.Body>
-                            <div className="row text-center">
-                                <div className="col">
-                                    <div className="fs-5 fw-semibold">{customerDetails.id}</div>
-                                    <div className="text-black-50 small">id</div>
-                                </div>
-                               
-                                <div className="vr p-0" />
-                                <div className="col">
-                                    <div className="fs-5 fw-semibold">
-                                        {customerDetails.available ? 
-                                        <small className="ms-auto"><Badge bg="success" className="ms-auto">YES</Badge></small>
-                                        : (
-                                        <small className="ms-auto"><Badge bg="danger" className="ms-auto">NO</Badge></small>
-                                        )} </div>
-                                    <div className="text-black-50 small">Available</div>
-                                </div>
-                                <div className="vr p-0" />
-                                <div className="col">
-                                    <div className="fs-5 fw-semibold">
-                                        <div className="text-center" style={{ whiteSpace: 'pre' }}>
-                                            {(new Date(customerDetails.createdAt))
-                                            .toLocaleDateString('es-ES', 
-                                            {
-                                                year: 'numeric', 
-                                                month: '2-digit',
-                                                day: '2-digit',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                                second: '2-digit',
-                                                hour12: false,
-                                            }
-                                    )}</div>
-                                    </div>
-                                    <div className="text-black-50 small">Register Date</div>
-                                </div>
-                                <div className="vr p-0" />
-                                <div className="col">
-                                    <div className="fs-5 fw-semibold">
-                                        <div className="fs-5 fw-semibold">
-                                            {customerDetails.store_id}
-                                        </div>
-                                    </div>
-                                    <div className="text-black-50 small">Store id</div>
-                                </div>
-                            </div>
+
+                        <Card.Body>   
+                            <Form onSubmit={handleFormSubmit}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Customer Name</Form.Label>
+                                <Form.Control
+                                type="text"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Check
+                                type="checkbox"
+                                label="Available"
+                                checked={available}
+                                onChange={(e) => setAvailable(e.target.checked)}
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Start Date</Form.Label>
+                                <Form.Control
+                                type="text"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Store id</Form.Label>
+                                <Form.Control
+                                type="text"
+                                value={storeId}
+                                onChange={(e) => setStoreId(e.target.value)}
+                                />
+                            </Form.Group>
+                            <Button variant="primary" type="submit">
+                                Save
+                            </Button>
+                            </Form>
                         </Card.Body>
                     </Card>
                 </div> 
     ) : (
-         <p>Loading products...</p>
+         <p>Loading customers...</p>
     )}
     </Container></>
 </AdminLayout>    

@@ -1,7 +1,7 @@
-import { Dropdown, Table } from 'react-bootstrap'
+import { Dropdown, Form, Table } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons'
-import React, { createContext } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Producto } from '@models/producto'
 import { THSort } from '@components/TableSort'
@@ -38,15 +38,64 @@ type Props = {
 
 export default function ProductoList(props: Props) {
   const { productos, setSort, setOrder } = props
-
+  const [filteredProductos, setFilteredProductos] = useState(productos); 
+  
   const router = useRouter();
+
+  const filterProductos = (filterText: string) => {
+    
+    console.log(filterText);
+    const filtered = productos.filter((producto) =>
+      producto.name.toLowerCase().includes(filterText.toLowerCase())
+    );
+    console.log(filtered);
+    setFilteredProductos(filtered);
+  };
+
+  useEffect(() => {
+    setFilteredProductos(productos); 
+  }, [productos]);
+
+  const navigateToInfo = (productId: number) => {
+    router.push(`/productos/info?id=${productId}`); 
+  };
 
   const navigateToEdit = (productId: number) => {
     router.push(`/productos/edit?id=${productId}`); 
   };
 
+  const navigateToDelete = (productId: number) => {
+    if(confirm("Are you sure to delete the product with id "+productId + " ?")) {
+      fetch(`${process.env.NEXT_PUBLIC_LIST_API_BASE_URL}productos/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json', 
+        },
+      })
+        .then((response) => {
+          if (response.ok) {
+            alert('Successfully deleted product'); 
+            router.push(`/productos/client`);          
+          } else {
+            console.error('Error updating product:', response.status);        
+          }
+        })
+        .catch((error) => {
+          console.error('Error deleting product: ', error);
+        });
+    } 
+  };
+
   return (
-    
+  <div>
+    <Form.Group>
+      <Form.Control
+        type="text"
+        placeholder="Filter by product name"
+        onChange={(e) => filterProductos(e.target.value)}
+      />
+    </Form.Group>
+  
     <Table responsive bordered hover>
       <thead className="bg-light">
         <tr>
@@ -59,7 +108,7 @@ export default function ProductoList(props: Props) {
         </tr>
       </thead>
       <tbody>
-        {productos.map((producto) => (
+        {filteredProductos.map((producto) => (
           <tr key={producto.id}>
             <td>{producto.id}</td> 
             <td>
@@ -107,13 +156,15 @@ export default function ProductoList(props: Props) {
                 </Dropdown.Toggle>
                 
                 <Dropdown.Menu>  
-                <Dropdown.Item onClick={() => navigateToEdit(producto.id)}>
+                <Dropdown.Item onClick={() => navigateToInfo(producto.id)}>
                     Info
                   </Dropdown.Item>
-                  <Dropdown.Item href={`/productos/edit`}>Edit</Dropdown.Item>
+                  <Dropdown.Item onClick={() => navigateToEdit(producto.id)}>
+                    Edit
+                  </Dropdown.Item>
                   <Dropdown.Item
                     className="text-danger"
-                    href="#/action-3"
+                    onClick={() => navigateToDelete(producto.id)}
                   >
                     Delete
                   </Dropdown.Item>
@@ -124,5 +175,6 @@ export default function ProductoList(props: Props) {
         ))}
       </tbody>
     </Table>
+  </div>
   )
 }
